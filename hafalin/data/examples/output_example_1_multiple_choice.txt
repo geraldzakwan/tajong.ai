@@ -1,0 +1,6 @@
+Pulau Sumatera sebelah selatan dan barat berbatasan dengan ....
+a;Selat Sunda dan Samudera Pasifik
+b;Selat Sunda dan Samudera Indonesia
+c;Selat Sunda dan Samudera Hindia
+d;Selat Sunda dan Samudera Arktik
+a
