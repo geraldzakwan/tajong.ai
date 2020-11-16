@@ -9,7 +9,8 @@ SPACY_FORMATTED_TRAIN_DATA_PATH = "{}/spacy_formatted_train_data.pk".format(DATA
 
 MODEL_DIR = "ner/model"
 
-MODEL_V1_PATH = "{}/model_v1.ml".format(MODEL_DIR)
+MODEL_V0_PATH = "{}/model_v0_100".format(MODEL_DIR)
+MODEL_V1_PATH = "{}/model_v1".format(MODEL_DIR)
 
 EXAMPLE_DOC_DIR = "{}/example_docs".format(DATA_DIR)
 

@@ -1,3 +1,4 @@
+import sys
 import time
 import random
 import pickle
@@ -5,17 +6,20 @@ import pickle
 from spacy.util import minibatch, compounding
 from spacy import load, displacy, blank
 
-from __init__ import SPACY_FORMATTED_TRAIN_DATA_PATH, MODEL_V1_PATH
+from __init__ import SPACY_FORMATTED_TRAIN_DATA_PATH, MODEL_DIR, MODEL_V1_PATH
 from __init__ import EXAMPLE_DOC_1_PATH, EXAMPLE_DOC_2_PATH, EXAMPLE_DOC_3_PATH
 
 class Trainer:
 
-    def __init__(self, train_data_filepath, saved_model_filepath, num_iters, print_freq, test_docs=[], verbose=False):
+    def __init__(self, train_data_filepath, saved_model_filepath, num_iters, print_freq, save_freq, test_docs=[], verbose=False):
+        start = time.time()
+
         self.train_data_filepath = train_data_filepath
         self.saved_model_filepath = saved_model_filepath
 
         self.num_iters = num_iters
         self.print_freq = print_freq
+        self.save_freq = save_freq
 
         self.nlp = blank("id")
 
@@ -25,15 +29,23 @@ class Trainer:
 
         if self.verbose:
             print("Initialization finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
     def load_dataset(self):
+        start = time.time()
+
         with open(self.train_data_filepath, "rb") as f:
             self.data = pickle.load(f)
 
         if self.verbose:
             print("Load dataset finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
     def setup_training(self):
+        start = time.time()
+
         self.nlp.add_pipe(self.nlp.create_pipe("ner"))
 
         self.nlp.begin_training()
@@ -51,6 +63,8 @@ class Trainer:
 
         if self.verbose:
             print("Setup training finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
     def train(self):
         start = time.time()
@@ -76,33 +90,78 @@ class Trainer:
                 if (iteration + 1) % self.print_freq == 0:
                     print("Iteration {}".format(iteration + 1))
                     print("Losses: {}".format(losses))
-                    print("Time Elapsed: {} seconds".format(time.time()-start))
+                    print("Time elapsed: {} seconds".format(time.time()-start))
+                    print("--------------------------------------------------")
 
-        for doc in self.test_docs
-            pred_ents = self.nlp(doc)
+            if (iteration + 1) % self.save_freq == 0:
+                self.save(iteration + 1)
+
+        if len(self.test_docs) > 0:
+            self.predict()
+
+    def predict(self):
+        start = time.time()
+
+        self.pred_docs_ents = []
+
+        for doc in self.test_docs:
+            self.pred_docs_ents.append(self.nlp(doc))
+
+        if self.verbose:
+            self.display()
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
+
+        return self.pred_docs_ents
+
+    def display(self):
+        for pred_ents in self.pred_docs_ents:
+            print(pred_ents)
+            print("--------------------------------------------------")
 
             print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
 
             displacy.render(pred_ents, style="ent")
-
             print("--------------------------------------------------")
 
-    def save(self):
-        self.nlp.to_disk(self.saved_model_filepath)
+    def save(self, iteration):
+        start = time.time()
+
+        self.nlp.to_disk(self.saved_model_filepath + "_{}".format(iteration))
 
         if self.verbose:
             print("NER model is saved to: {}".format(self.saved_model_filepath))
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
 if __name__ == '__main__':
     docs = []
-    
+
     for filepath in [EXAMPLE_DOC_1_PATH, EXAMPLE_DOC_2_PATH, EXAMPLE_DOC_3_PATH]:
-        with open(EXAMPLE_DOC_1_PATH, "r") as infile:
+        with open(filepath, "r") as infile:
             docs.append(infile.read())
 
-    trainer = Trainer(SPACY_FORMATTED_TRAIN_DATA_PATH, MODEL_V1_PATH, num_iters=100, print_freq=10, test_docs=docs, verbose=True)
+    if sys.argv[1] == "default":
+        trainer = Trainer(
+            train_data_filepath=SPACY_FORMATTED_TRAIN_DATA_PATH,
+            saved_model_filepath=MODEL_V1_PATH,
+            num_iters=100,
+            print_freq=10,
+            save_freq=10,
+            test_docs=docs,
+            verbose=True
+        )
+    else:
+        trainer = Trainer(
+            train_data_filepath=SPACY_FORMATTED_TRAIN_DATA_PATH,
+            saved_model_filepath="{}/{}".format(MODEL_DIR, sys.argv[1]),
+            num_iters=int(sys.argv[2]),
+            print_freq=int(sys.argv[3]),
+            save_freq=int(sys.argv[4]),
+            test_docs=docs,
+            verbose=True
+        )
 
     trainer.load_dataset()
     trainer.setup_training()
     trainer.train()
-    trainer.save()
