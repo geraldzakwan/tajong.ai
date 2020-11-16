@@ -21,7 +21,7 @@ curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?d
 ```
 
 ```
-curl --location --request POST 'https://hafalin.herokuapp.com/generate_question' \
+curl --location --request POST 'https://hafalin.herokuapp.com/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "test",
@@ -36,7 +36,7 @@ curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?d
 ```
 
 ```
-curl --location --request POST 'https://hafalin.herokuapp.com/generate_question' \
+curl --location --request POST 'https://hafalin.herokuapp.com/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "test",
