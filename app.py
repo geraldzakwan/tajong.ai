@@ -5,8 +5,11 @@ from hafalin.questiongen.questiongen import QuestionGen
 
 from flask import Flask, request, jsonify
 
+import config
+
 app = Flask(__name__)
-app.question_gen = QuestionGen(is_mock=True)
+app.config = config.current
+app.question_gen = QuestionGen(is_mock=app.config.is_mock)
 
 @app.route("/")
 def index():
@@ -24,7 +27,7 @@ def post_something():
 
     if document:
         if type:
-            if app.question_gen.is_mock:
+            if app.config.is_mock:
                 with open(INPUT_EXAMPLE_1_FILEPATH) as infile:
                     document = infile.read().replace("\n", " ")
 
