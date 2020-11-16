@@ -1,5 +1,4 @@
 # QuestionGen class
-# CC: Thiago
 
 from questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
 
@@ -13,7 +12,8 @@ class QuestionGen:
     #        See /hafalin/data/input_example_1.txt for example.
 
     # Output: A dictionary. for example:
-    #         See /hafalin/data/output_example_1.py for example.
+    #         See /hafalin/data/output_example_1_short_answer.txt
+    #         and /hafalin/data/output_example_1_multiple_choice.txt for example.
 
     # Outputs explanation per key:
 

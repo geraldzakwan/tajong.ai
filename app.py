@@ -1,74 +1,66 @@
-# # Main web app: Use Flask/Django or whatever
-# # CC: Lerps
-#
-# # Example of using QuestionGen module
-#
-# from questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
-#
-# from questiongen.questiongen import QuestionGen
-#
-# question_gen = QuestionGen(is_mock=True)
-#
-# # Read input example and replace newline with space
-# with open(INPUT_EXAMPLE_1_FILEPATH) as infile:
-#     document = infile.read().replace("\n", " ")
-#
-# short_answer = question_gen.generate(document=document, question_type="short_answer")
-#
-# multiple_choice = question_gen.generate(document=document, question_type="multiple_choice")
-#
-# print(short_answer)
-#
-# print(multiple_choice)
+# Main web app: Use Flask/Django or whatever
 
-# app.py
+from questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
+from questiongen.questiongen import QuestionGen
+
 from flask import Flask, request, jsonify
+
 app = Flask(__name__)
+app.question_gen = QuestionGen(is_mock=True)
 
-@app.route('/getmsg/', methods=['GET'])
-def respond():
-    # Retrieve the name from url parameter
-    name = request.args.get("name", None)
-
-    # For debugging
-    print(f"got name {name}")
-
-    response = {}
-
-    # Check if user sent a name at all
-    if not name:
-        response["ERROR"] = "no name found, please send a name."
-    # Check if the user entered a number not a name
-    elif str(name).isdigit():
-        response["ERROR"] = "name can't be numeric."
-    # Now the user entered a valid name
-    else:
-        response["MESSAGE"] = f"Welcome {name} to our awesome platform!!"
-
-    # Return the response in json format
-    return jsonify(response)
-
-@app.route('/post/', methods=['POST'])
-def post_something():
-    param = request.form.get('name')
-    print(param)
-    # You can add the test cases you made in the previous function, but in our case here you are just testing the POST functionality
-    if param:
-        return jsonify({
-            "Message": f"Welcome {name} to our awesome platform!!",
-            # Add this option to distinct the POST request
-            "METHOD" : "POST"
-        })
-    else:
-        return jsonify({
-            "ERROR": "no name found, please send a name."
-        })
-
-# A welcome message to test our server
-@app.route('/')
+@app.route("/")
 def index():
-    return "<h1>Welcome to our server !!</h1>"
+    return "<h1>HAFALIN 1.0 API</h1>"
+
+@app.route("/generate_question/", methods=["GET", "POST"])
+def post_something():
+    if request.method == "GET":
+        document = request.args.get("document", None)
+        type = request.args.get("type", None)
+
+    elif request.method == "POST":
+        document = request.form.get("document", None)
+        type = request.form.get("type", None)
+
+    if document:
+        if type:
+            if app.question_gen.is_mock:
+                with open(INPUT_EXAMPLE_1_FILEPATH) as infile:
+                    document = infile.read().replace("\n", " ")
+
+            if type == "short_answer":
+                return jsonify({
+                    "data": question_gen.generate(document=document, question_type="short_answer")
+                })
+
+            elif type == "multiple_choice"
+                return jsonify({
+                    "data": question_gen.generate(document=document, question_type="multiple_choice")
+                })
+
+            else:
+                return jsonify({
+                    "error": {
+                        "code": 400,
+                        "message": "Supported type is 'short_answer', 'multiple_choice', and 'all'"
+                    }
+                })
+
+        else:
+            return jsonify({
+                "error": {
+                    "code": 400,
+                    "message": "Type is not specified"
+                }
+            })
+
+    else:
+        return jsonify({
+            "error": {
+                "code": 400,
+                "message": "Document is not specified"
+            }
+        })
 
 if __name__ == '__main__':
-    # Threaded option to enable multiple instances for multiple user access support
     app.run(threaded=True, port=5000)

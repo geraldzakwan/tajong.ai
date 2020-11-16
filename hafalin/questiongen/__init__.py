@@ -1,5 +1,4 @@
 # Constants or whatever needed here for question generator module
-# CC: Thiago
 
 EXAMPLE_DIR = "hafalin/data/examples"
 
