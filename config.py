@@ -1,19 +1,19 @@
-prod = {
-    "is_mock": False,
-    "port": 5000,
-    "debug": False
-}
+configs = {
+    "prod": {
+        "IS_MOCK": False,
+        "PORT": 5000,
+        "DEBUG": False
+    },
 
-dev = {
-    "is_mock": False,
-    "port": 5001,
-    "debug": True
-}
+    "dev": {
+        "IS_MOCK": False,
+        "PORT": 5001,
+        "DEBUG": True
+    },
 
-mock = {
-    "is_mock": True,
-    "port": 5002,
-    "debug": True
+    "mock": {
+        "IS_MOCK": True,
+        "PORT": 5002,
+        "DEBUG": True
+    }
 }
-
-current = mock

@@ -1,15 +1,23 @@
 # Main web app: Use Flask/Django or whatever
 
+from flask import Flask, request, jsonify
+
 from hafalin.questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
 from hafalin.questiongen.questiongen import QuestionGen
 
-from flask import Flask, request, jsonify
+from config import configs
 
-import config
+from os import environ
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+mode = environ.get("MODE")
 
 app = Flask(__name__)
-app.config = config.current
-app.question_gen = QuestionGen(is_mock=app.config.is_mock)
+app.question_gen = QuestionGen(is_mock=configs[mode]["IS_MOCK"])
 
 @app.route("/")
 def index():
@@ -27,7 +35,7 @@ def post_something():
 
     if document:
         if type:
-            if app.config.is_mock:
+            if app.question_gen.is_mock:
                 with open(INPUT_EXAMPLE_1_FILEPATH) as infile:
                     document = infile.read().replace("\n", " ")
 
@@ -66,4 +74,4 @@ def post_something():
         })
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=8282, debug=True)
+    app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
