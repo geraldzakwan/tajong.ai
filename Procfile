@@ -1,1 +1,1 @@
-web: gunicorn app:hafalin/app
+web: gunicorn app:app
