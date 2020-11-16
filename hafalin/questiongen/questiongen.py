@@ -1,9 +1,9 @@
 import time
 
-from random import randint
+from random import randint, sample
 
 from hafalin.questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
-from hafalin.questiongen.__init__ import CHOICES
+from hafalin.questiongen.__init__ import CHOICES, MIN_CHOICES, MAX_CHOICES
 
 from ner.ner import NER
 
@@ -208,6 +208,16 @@ class QuestionGen:
         else:
             iteration = 0
 
+            entity_pool = {}
+            for (_, ents) in self.sentence_ents:
+                for ent in ents:
+                    word, _, label = ent
+
+                    if label not in entity_pool:
+                        entity_pool[label] = []
+
+                    entity_pool[label].append(word)
+
             for (sentence, ents) in self.sentence_ents:
                 if self.verbose:
                     print("Sentence: {}".format(sentence))
@@ -226,15 +236,29 @@ class QuestionGen:
                     else:
                         question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
 
-                    right_choice = CHOICES[randint(0, len(CHOICES) - 1)]
+                    entity_candidates = entity_pool[label]
+
+                    num_candidates = len(entity_candidates)
+                    if num_candidates < MIN_CHOICES:
+                        break
+
+                    if num_candidates > MAX_CHOICES:
+                        num_candidates = MAX_CHOICES
+
+                    random_entity_idxes = sample(range(0, len(entity_candidates)), num_candidates)
+
+                    right_choice = CHOICES[randint(0, num_candidates - 1)]
 
                     choices = {}
-                    for choice in CHOICES:
+                    idx = 0
+
+                    for choice in CHOICES[:num_candidates]:
+
                         if choice == right_choice:
                             choices[choice] = word
                         else:
-                            # TO BE IMPLEMENTED
-                            choices[choice] = "dummy"
+                            choices[choice] = entity_candidates[random_entity_idxes[idx]]
+                            idx = idx + 1
 
                     generated_questions.append({
                         "question": question,

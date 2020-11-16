@@ -17,7 +17,7 @@ A web app that could automatically generate academic questions (multiple choice 
 - Example Request using POST JSON
 
 ```
-curl --location --request POST 'http://127.0.0.1:5001/generate_question/' \
+curl --location --request POST 'http://127.0.0.1:5000/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera. Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur. Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia. Mereka juga melewati Provinsi Bengkulu, Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta.",
@@ -33,64 +33,70 @@ curl --location --request POST 'http://127.0.0.1:5001/generate_question/' \
     "data": {
         "multiple_choice": [
             {
-                "answer": "a",
+                "answer": "b",
                 "choices": {
-                    "a": "Roro",
-                    "b": "dummy",
-                    "c": "dummy",
-                    "d": "dummy"
-                },
-                "question": "... , Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera"
-            },
-            {
-                "answer": "d",
-                "choices": {
-                    "a": "dummy",
-                    "b": "dummy",
-                    "c": "dummy",
-                    "d": "Sumatera Barat"
-                },
-                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke  ...  yang terletak di Pulau Sumatera"
-            },
-            {
-                "answer": "c",
-                "choices": {
-                    "a": "dummy",
-                    "b": "dummy",
-                    "c": "Pulau Sumatera",
-                    "d": "dummy"
-                },
-                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di ..."
-            },
-            {
-                "answer": "d",
-                "choices": {
-                    "a": "dummy",
-                    "b": "dummy",
-                    "c": "dummy",
-                    "d": "Teluk Benggala"
+                    "a": "Jakarta",
+                    "b": "Teluk Benggala",
+                    "c": "Bengkulu",
+                    "d": "Selat Malaka",
+                    "e": "Selat Sunda"
                 },
                 "question": " Pulau ini berbatasan dengan  ...  pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
             },
             {
-                "answer": "a",
+                "answer": "c",
                 "choices": {
-                    "a": "Selat Sunda",
-                    "b": "dummy",
-                    "c": "dummy",
-                    "d": "dummy"
+                    "a": "Sumatera Selatan",
+                    "b": "Sumatera Barat",
+                    "c": "Selat Sunda",
+                    "d": "Selat Sunda",
+                    "e": "Selat Malaka"
                 },
                 "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara,  ...  pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
             },
             {
-                "answer": "a",
+                "answer": "d",
                 "choices": {
-                    "a": "Selat Malaka",
-                    "b": "dummy",
-                    "c": "dummy",
-                    "d": "dummy"
+                    "a": "Bengkulu",
+                    "b": "Sumatera Barat",
+                    "c": "Indonesia",
+                    "d": "Selat Malaka",
+                    "e": "Jakarta"
                 },
                 "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan  ...  pada sebelah timur"
+            },
+            {
+                "answer": "e",
+                "choices": {
+                    "a": "Sumatera Selatan",
+                    "b": "Pulau Sumatera",
+                    "c": "Teluk Benggala",
+                    "d": "Bengkulu",
+                    "e": "Pelabuhan Teluk Bayur"
+                },
+                "question": " Sebelum pulang, supir bus sengaja membawa mereka mampir ke  ...  yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia"
+            },
+            {
+                "answer": "e",
+                "choices": {
+                    "a": "Bengkulu",
+                    "b": "Pulau Sumatera",
+                    "c": "Teluk Benggala",
+                    "d": "Selat Malaka",
+                    "e": "Indonesia"
+                },
+                "question": " Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di ..."
+            },
+            {
+                "answer": "b",
+                "choices": {
+                    "a": "Jakarta",
+                    "b": "Bengkulu",
+                    "c": "Indonesia",
+                    "d": "Sumatera Selatan",
+                    "e": "Teluk Benggala"
+                },
+                "question": " Mereka juga melewati Provinsi  ... , Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta"
             }
         ],
         "short_answer": [
