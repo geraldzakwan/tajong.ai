@@ -80,12 +80,12 @@ def generate_question():
         return reply_error(code=400, message="Document is not specified")
 
 if __name__ == '__main__':
-    # app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
-    with open(EXAMPLE_DOCS_PATH, "r") as infile:
-        docs = infile.readlines()
-
-    for doc in docs:
-        doc = doc.strip("\n")
-
-        if len(doc) > 0:
-            app.question_gen.generate(doc, "short_answer", 1)
+    app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
+    # with open(EXAMPLE_DOCS_PATH, "r") as infile:
+    #     docs = infile.readlines()
+    #
+    # for doc in docs:
+    #     doc = doc.strip("\n")
+    #
+    #     if len(doc) > 0:
+    #         app.question_gen.generate(doc, "short_answer", 1)

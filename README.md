@@ -14,21 +14,15 @@ A web app that could automatically generate academic questions (multiple choice 
 
 # How to use API
 
-- Example Request using GET params
-
-```
-curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?document=test&type=all&max_questions=1'
-```
-
 - Example Request using POST JSON
 
 ```
-curl --location --request POST 'https://hafalin.herokuapp.com//generate_question/' \
+curl --location --request POST 'http://127.0.0.1:5001/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "document": "test",
+    "document": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera. Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur. Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia. Mereka juga melewati Provinsi Bengkulu, Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta.",
     "type": "all",
-    "max_questions": 1
+    "max_questions": 5
 }'
 ```
 
@@ -41,21 +35,100 @@ curl --location --request POST 'https://hafalin.herokuapp.com//generate_question
             {
                 "answer": "a",
                 "choices": {
-                    "a": "Selat Sunda dan Samudera Pasifik",
-                    "b": "Selat Sunda dan Samudera Indonesia",
-                    "c": "Selat Sunda dan Samudera Hindia",
-                    "d": "Selat Sunda dan Samudera Arktik"
+                    "a": "Roro",
+                    "b": "dummy",
+                    "c": "dummy",
+                    "d": "dummy"
                 },
-                "question": "Pulau Sumatera sebelah selatan dan barat berbatasan dengan ...."
+                "question": "... , Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera"
+            },
+            {
+                "answer": "d",
+                "choices": {
+                    "a": "dummy",
+                    "b": "dummy",
+                    "c": "dummy",
+                    "d": "Sumatera Barat"
+                },
+                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke  ...  yang terletak di Pulau Sumatera"
+            },
+            {
+                "answer": "c",
+                "choices": {
+                    "a": "dummy",
+                    "b": "dummy",
+                    "c": "Pulau Sumatera",
+                    "d": "dummy"
+                },
+                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di ..."
+            },
+            {
+                "answer": "d",
+                "choices": {
+                    "a": "dummy",
+                    "b": "dummy",
+                    "c": "dummy",
+                    "d": "Teluk Benggala"
+                },
+                "question": " Pulau ini berbatasan dengan  ...  pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
+            },
+            {
+                "answer": "a",
+                "choices": {
+                    "a": "Selat Sunda",
+                    "b": "dummy",
+                    "c": "dummy",
+                    "d": "dummy"
+                },
+                "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara,  ...  pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
+            },
+            {
+                "answer": "a",
+                "choices": {
+                    "a": "Selat Malaka",
+                    "b": "dummy",
+                    "c": "dummy",
+                    "d": "dummy"
+                },
+                "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan  ...  pada sebelah timur"
             }
         ],
         "short_answer": [
             {
                 "answer": [
-                    "Teluk Bayur",
+                    "Roro"
+                ],
+                "question": "... , Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera"
+            },
+            {
+                "answer": [
+                    "Sumatera Barat"
+                ],
+                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke  ...  yang terletak di Pulau Sumatera"
+            },
+            {
+                "answer": [
+                    "Pulau Sumatera"
+                ],
+                "question": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di ..."
+            },
+            {
+                "answer": [
+                    "Teluk Benggala"
+                ],
+                "question": " Pulau ini berbatasan dengan  ...  pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
+            },
+            {
+                "answer": [
                     "Selat Sunda"
                 ],
-                "question": "Salah satu pelabuhan yang terdapat di Provinsi Sumatera Barat adalah Pelabuhan ...."
+                "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara,  ...  pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur"
+            },
+            {
+                "answer": [
+                    "Selat Malaka"
+                ],
+                "question": " Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan  ...  pada sebelah timur"
             }
         ]
     }

@@ -1,6 +1,9 @@
 import time
 
+from random import randint
+
 from hafalin.questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
+from hafalin.questiongen.__init__ import CHOICES
 
 from ner.ner import NER
 
@@ -45,8 +48,6 @@ class QuestionGen:
     #    Student's answer is correct if it matches one of the List element.
     #    We will also use edit distance so minor typo won't be deemed as incorrect.
     def generate(self, document, question_type, max_questions):
-        start = time.time()
-
         self.document = document
         self.question_type = question_type
         self.max_questions = max_questions
@@ -102,6 +103,39 @@ class QuestionGen:
         else:
             self.identify_entities()
 
+            iteration = 0
+
+            for (sentence, ents) in self.sentence_ents:
+                if self.verbose:
+                    print("Sentence: {}".format(sentence))
+                    print("--------------------------------------------------")
+                    print("Ents:")
+                    print(ents)
+                    print("--------------------------------------------------")
+
+                for ent in ents:
+                    word, word_idx, label = ent
+
+                    if word_idx == 0:
+                        question = "... " + sentence[len(word):]
+                    elif word_idx + len(word) == len(sentence):
+                        question = sentence[:word_idx] + "..."
+                    else:
+                        question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
+
+                    generated_questions.append({
+                        "question": question,
+                        "answer": [word]
+                    })
+
+                    iteration += 1
+                    if iteration > self.max_questions:
+                        break
+
+                if iteration > self.max_questions:
+                    break
+
+
         if self.verbose:
             print("Generate short answer finishes")
             print("Time elapsed: {} seconds".format(time.time() - start))
@@ -124,6 +158,7 @@ class QuestionGen:
     #     "answer": "a"
     # }]
     def generate_multiple_choice(self):
+        start = time.time()
 
         # List of questions generated
         generated_questions = []
@@ -171,7 +206,48 @@ class QuestionGen:
                 })
 
         else:
-            self.identify_entities()
+            iteration = 0
+
+            for (sentence, ents) in self.sentence_ents:
+                if self.verbose:
+                    print("Sentence: {}".format(sentence))
+                    print("--------------------------------------------------")
+                    print("Ents:")
+                    print(ents)
+                    print("--------------------------------------------------")
+
+                for ent in ents:
+                    word, word_idx, label = ent
+
+                    if word_idx == 0:
+                        question = "... " + sentence[len(word):]
+                    elif word_idx + len(word) == len(sentence):
+                        question = sentence[:word_idx] + "..."
+                    else:
+                        question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
+
+                    right_choice = CHOICES[randint(0, len(CHOICES) - 1)]
+
+                    choices = {}
+                    for choice in CHOICES:
+                        if choice == right_choice:
+                            choices[choice] = word
+                        else:
+                            # TO BE IMPLEMENTED
+                            choices[choice] = "dummy"
+
+                    generated_questions.append({
+                        "question": question,
+                        "choices": choices,
+                        "answer": right_choice
+                    })
+
+                    iteration += 1
+                    if iteration > self.max_questions:
+                        break
+
+                if iteration > self.max_questions:
+                    break
 
         if self.verbose:
             print("Generate multiple choice finishes")
@@ -189,6 +265,8 @@ class QuestionGen:
     # Sample output:
     #
     def identify_entities(self):
+        start = time.time()
+
         self.pred_ents = self.ner.predict([self.document])[0]
         self.sentence_ents = []
 
@@ -200,12 +278,16 @@ class QuestionGen:
                 word_idx = sentence.find(word)
 
                 if word_idx > -1:
-                    self.ents.append((word_idx, label))
+                    self.ents.append((word, word_idx, label))
 
             self.sentence_ents.append((sentence, self.ents))
 
         if self.verbose:
             print(self.sentence_ents)
+            print("--------------------------------------------------")
+            print("Identify entities finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
 if __name__ == '__main__':
     question_gen = QuestionGen(
