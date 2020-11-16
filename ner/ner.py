@@ -3,8 +3,8 @@ import time
 
 from spacy import load, displacy
 
-from __init__ import MODEL_DIR, DEFAULT_MODEL_PATH
-from __init__ import EXAMPLE_DOCS_PATH
+from ner.__init__ import MODEL_DIR, DEFAULT_MODEL_PATH
+from ner.__init__ import EXAMPLE_DOCS_PATH
 
 class NER:
 

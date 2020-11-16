@@ -8,7 +8,7 @@ class QuestionGen:
         self.is_mock = is_mock
 
         self.ner = None
-        if !self.is_mock:
+        if not self.is_mock:
             self.ner = ner
 
     # Still a mock
