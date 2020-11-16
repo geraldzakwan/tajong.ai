@@ -1,11 +1,12 @@
 # Main web app: Use Flask/Django or whatever
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 
 from hafalin.questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
 from hafalin.questiongen.questiongen import QuestionGen
 
 from config import configs
+from helper import reply_success, reply_error
 
 from os import environ
 from os.path import join, dirname
@@ -36,12 +37,7 @@ def generate_question():
         type = json_req["type"]
 
     else:
-        return jsonify({
-            "error": {
-                "code": 400,
-                "message": "Supported method is 'GET' and 'POST'"
-            }
-        })
+        return reply_error(code=400, message="Supported method is 'GET' and 'POST'")
 
     if document:
         if type:
@@ -50,38 +46,19 @@ def generate_question():
                     document = infile.read().replace("\n", " ")
 
             if type == "short_answer":
-                return jsonify({
-                    "data": app.question_gen.generate(document=document, question_type="short_answer")
-                })
+                return reply_success(data=app.question_gen.generate(document=document, question_type="short_answer"))
 
             elif type == "multiple_choice":
-                return jsonify({
-                    "data": app.question_gen.generate(document=document, question_type="multiple_choice")
-                })
+                return reply_success(data=app.question_gen.generate(document=document, question_type="multiple_choice"))
 
             else:
-                return jsonify({
-                    "error": {
-                        "code": 400,
-                        "message": "Supported type is 'short_answer', 'multiple_choice', and 'all'"
-                    }
-                })
+                return reply_error(code=400, message="Supported type is 'short_answer', 'multiple_choice', and 'all'")
 
         else:
-            return jsonify({
-                "error": {
-                    "code": 400,
-                    "message": "Type is not specified"
-                }
-            })
+            return reply_error(code=400, message="Type is not specified")
 
     else:
-        return jsonify({
-            "error": {
-                "code": 400,
-                "message": "Document is not specified"
-            }
-        })
+        return reply_error(code=400, message="Document is not specified")
 
 if __name__ == '__main__':
     app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
