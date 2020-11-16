@@ -12,8 +12,6 @@ MODEL_DIR = "ner/model"
 MODEL_V0_PATH = "{}/model_v0_100".format(MODEL_DIR)
 MODEL_V1_PATH = "{}/model_v1".format(MODEL_DIR)
 
-EXAMPLE_DOC_DIR = "{}/example_docs".format(DATA_DIR)
+DEFAULT_MODEL_PATH = MODEL_V0_PATH
 
-EXAMPLE_DOC_1_PATH = "{}/example_doc_1.txt".format(EXAMPLE_DOC_DIR)
-EXAMPLE_DOC_2_PATH = "{}/example_doc_2.txt".format(EXAMPLE_DOC_DIR)
-EXAMPLE_DOC_3_PATH = "{}/example_doc_3.txt".format(EXAMPLE_DOC_DIR)
+EXAMPLE_DOCS_PATH = "{}/example_docs.txt".format(DATA_DIR)

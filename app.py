@@ -5,6 +5,8 @@ from flask import Flask, request
 from hafalin.questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
 from hafalin.questiongen.questiongen import QuestionGen
 
+from ner.ner import NER
+
 from config import configs
 from helper import reply_success, reply_error
 
@@ -18,7 +20,10 @@ load_dotenv(dotenv_path)
 mode = environ.get("MODE")
 
 app = Flask(__name__)
-app.question_gen = QuestionGen(is_mock=configs[mode]["IS_MOCK"])
+app.question_gen = QuestionGen(
+    is_mock=configs[mode]["IS_MOCK"],
+    ner=NER(model_filepath="default", verbose=True)
+)
 
 @app.route("/")
 def index():

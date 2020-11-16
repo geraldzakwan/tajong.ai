@@ -135,11 +135,8 @@ class Trainer:
             print("--------------------------------------------------")
 
 if __name__ == '__main__':
-    docs = []
-
-    for filepath in [EXAMPLE_DOC_1_PATH, EXAMPLE_DOC_2_PATH, EXAMPLE_DOC_3_PATH]:
-        with open(filepath, "r") as infile:
-            docs.append(infile.read())
+    with open(EXAMPLE_DOCS_PATH, "r") as infile:
+        docs = infile.readlines()
 
     if sys.argv[1] == "default":
         trainer = Trainer(

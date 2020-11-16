@@ -4,8 +4,12 @@ from hafalin.questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH,
 
 class QuestionGen:
 
-    def __init__(self, is_mock):
+    def __init__(self, is_mock, ner):
         self.is_mock = is_mock
+
+        self.ner = None
+        if !self.is_mock:
+            self.ner = ner
 
     # Still a mock
     # Input: Document: String of any length.

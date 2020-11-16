@@ -3,15 +3,19 @@ import time
 
 from spacy import load, displacy
 
-from __init__ import MODEL_DIR, MODEL_V0_PATH, MODEL_V1_PATH
-from __init__ import EXAMPLE_DOC_1_PATH, EXAMPLE_DOC_2_PATH, EXAMPLE_DOC_3_PATH
+from __init__ import MODEL_DIR, DEFAULT_MODEL_PATH
+from __init__ import EXAMPLE_DOCS_PATH
 
 class NER:
 
     def __init__(self, model_filepath, verbose=False):
         start = time.time()
 
-        self.model_filepath = model_filepath
+        if model_filepath == "default":
+            self.model_filepath = DEFAULT_MODEL_PATH
+        else:
+            self.model_filepath = model_filepath
+
         self.verbose = verbose
 
         if self.verbose:
@@ -55,14 +59,11 @@ class NER:
             print("--------------------------------------------------")
 
 if __name__ == '__main__':
-    docs = []
-
-    for filepath in [EXAMPLE_DOC_1_PATH, EXAMPLE_DOC_2_PATH, EXAMPLE_DOC_3_PATH]:
-        with open(filepath, "r") as infile:
-            docs.append(infile.read())
+    with open(EXAMPLE_DOCS_PATH, "r") as infile:
+        docs = infile.readlines()
 
     if sys.argv[1] == "default":
-        ner = NER(model_filepath=MODEL_V0_PATH, verbose=True)
+        ner = NER(model_filepath=DEFAULT_MODEL_PATH, verbose=True)
     else:
         ner = NER(model_filepath="{}/{}".format(MODEL_DIR, sys.argv[1]), verbose=True)
 
