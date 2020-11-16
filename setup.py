@@ -10,7 +10,7 @@ with open('LICENSE.md') as f:
 setup(
     name='hafalin',
     version='0.1.0',
-    description='Sample package for Python-Guide.org',
+    description='Hafalin API, an API to generate questions given document',
     long_description=readme,
     author='Geraldi Dzakwan; Ari Pratama Zhorifiandi',
     author_email='geraldi.dzakwan@gmail.com; arizho16@gmail.com',

@@ -10,4 +10,4 @@ A web app that could automatically generate academic questions (multiple choice 
 
 - Run the web app
 
-  `python3 hafalin/app.py`
+  `python3 app.py`

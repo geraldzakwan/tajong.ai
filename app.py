@@ -1,7 +1,7 @@
 # Main web app: Use Flask/Django or whatever
 
-from questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
-from questiongen.questiongen import QuestionGen
+from hafalin.questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
+from hafalin.questiongen.questiongen import QuestionGen
 
 from flask import Flask, request, jsonify
 
@@ -30,12 +30,12 @@ def post_something():
 
             if type == "short_answer":
                 return jsonify({
-                    "data": question_gen.generate(document=document, question_type="short_answer")
+                    "data": app.question_gen.generate(document=document, question_type="short_answer")
                 })
 
-            elif type == "multiple_choice"
+            elif type == "multiple_choice":
                 return jsonify({
-                    "data": question_gen.generate(document=document, question_type="multiple_choice")
+                    "data": app.question_gen.generate(document=document, question_type="multiple_choice")
                 })
 
             else:
@@ -63,4 +63,4 @@ def post_something():
         })
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=5000)
+    app.run(threaded=True, port=8282, debug=True)

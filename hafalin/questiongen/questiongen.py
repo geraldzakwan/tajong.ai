@@ -1,6 +1,6 @@
 # QuestionGen class
 
-from questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
+from hafalin.questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
 
 class QuestionGen:
 
