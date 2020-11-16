@@ -11,12 +11,14 @@ class NER:
     def __init__(self, model_filepath, verbose=False):
         start = time.time()
 
+        self.verbose = verbose
+
         if model_filepath == "default":
             self.model_filepath = DEFAULT_MODEL_PATH
         else:
             self.model_filepath = model_filepath
 
-        self.verbose = verbose
+        self.load_model()
 
         if self.verbose:
             print("Initialization finishes")
@@ -59,13 +61,20 @@ class NER:
             print("--------------------------------------------------")
 
 if __name__ == '__main__':
-    with open(EXAMPLE_DOCS_PATH, "r") as infile:
-        docs = infile.readlines()
-
     if sys.argv[1] == "default":
         ner = NER(model_filepath=DEFAULT_MODEL_PATH, verbose=True)
     else:
         ner = NER(model_filepath="{}/{}".format(MODEL_DIR, sys.argv[1]), verbose=True)
 
-    ner.load_model()
+    with open(EXAMPLE_DOCS_PATH, "r") as infile:
+        raw_docs = infile.readlines()
+
+    docs = []
+    
+    for doc in raw_docs:
+        doc = doc.strip("\n")
+
+        if len(doc) > 0:
+            docs.append(doc)
+
     ner.predict(docs)

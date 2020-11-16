@@ -5,6 +5,7 @@ from flask import Flask, request
 from hafalin.questiongen.__init__ import INPUT_EXAMPLE_1_FILEPATH
 from hafalin.questiongen.questiongen import QuestionGen
 
+from ner.__init__ import EXAMPLE_DOCS_PATH
 from ner.ner import NER
 
 from config import configs
@@ -22,7 +23,8 @@ mode = environ.get("MODE")
 app = Flask(__name__)
 app.question_gen = QuestionGen(
     is_mock=configs[mode]["IS_MOCK"],
-    ner=NER(model_filepath="default", verbose=True)
+    ner=NER(model_filepath="default", verbose=True),
+    verbose=True
 )
 
 @app.route("/")
@@ -78,4 +80,12 @@ def generate_question():
         return reply_error(code=400, message="Document is not specified")
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
+    # app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
+    with open(EXAMPLE_DOCS_PATH, "r") as infile:
+        docs = infile.readlines()
+
+    for doc in docs:
+        doc = doc.strip("\n")
+
+        if len(doc) > 0:
+            app.question_gen.generate(doc, "short_answer", 1)

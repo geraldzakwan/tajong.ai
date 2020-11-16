@@ -1,15 +1,26 @@
-# QuestionGen class
+import time
 
 from hafalin.questiongen.__init__ import OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH
 
+from ner.ner import NER
+
 class QuestionGen:
 
-    def __init__(self, is_mock, ner):
+    def __init__(self, is_mock, ner, verbose):
+        start = time.time()
+
+        self.verbose = verbose
+
         self.is_mock = is_mock
 
         self.ner = None
         if not self.is_mock:
             self.ner = ner
+
+        if self.verbose:
+            print("Initialization finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
     # Still a mock
     # Input: Document: String of any length.
@@ -34,6 +45,7 @@ class QuestionGen:
     #    Student's answer is correct if it matches one of the List element.
     #    We will also use edit distance so minor typo won't be deemed as incorrect.
     def generate(self, document, question_type, max_questions):
+        start = time.time()
 
         self.document = document
         self.question_type = question_type
@@ -57,6 +69,7 @@ class QuestionGen:
     #     "answer": ["Teluk Bayur", "Selat Sunda"]
     # }]
     def generate_short_answer(self):
+        start = time.time()
 
         # List of questions generated
         generated_questions = []
@@ -87,7 +100,12 @@ class QuestionGen:
                 })
 
         else:
-            raise Exception("Not implemented yet!")
+            self.identify_entities()
+
+        if self.verbose:
+            print("Generate short answer finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
         return generated_questions
 
@@ -153,6 +171,54 @@ class QuestionGen:
                 })
 
         else:
-            raise Exception("Not implemented yet!")
+            self.identify_entities()
+
+        if self.verbose:
+            print("Generate multiple choice finishes")
+            print("Time elapsed: {} seconds".format(time.time() - start))
+            print("--------------------------------------------------")
 
         return generated_questions
+
+    # Sample input:
+    # Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera. Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur. Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia. Mereka juga melewati Provinsi Bengkulu, Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta.
+    #
+    # --------------------------------------------------
+    # Entities: [('Roro', 'PERSON'), ('Sumatera Barat', 'LOCATION'), ('Pulau Sumatera', 'LOCATION'), ('Teluk Benggala', 'LOCATION'), ('Selat Sunda', 'LOCATION'), ('Selat Malaka', 'LOCATION'), ('Pelabuhan Teluk Bayur', 'LOCATION'), ('Indonesia', 'LOCATION'), ('Bengkulu', 'LOCATION'), ('Sumatera Selatan', 'LOCATION'), ('Jakarta', 'LOCATION')]
+
+    # Sample output:
+    #
+    def identify_entities(self):
+        self.pred_ents = self.ner.predict([self.document])[0]
+        self.sentence_ents = []
+
+        for sentence in self.document.split("."):
+            self.ents = []
+
+            for ent in self.pred_ents.ents:
+                word, label = ent.text, ent.label_
+                word_idx = sentence.find(word)
+
+                if word_idx > -1:
+                    self.ents.append((word_idx, label))
+
+            self.sentence_ents.append((sentence, self.ents))
+
+        if self.verbose:
+            print(self.sentence_ents)
+
+if __name__ == '__main__':
+    question_gen = QuestionGen(
+        is_mock=False,
+        ner=NER(model_filepath="default", verbose=True),
+        verbose=True
+    )
+
+    with open(EXAMPLE_DOCS_PATH, "r") as infile:
+        docs = infile.readlines()
+
+    for doc in docs:
+        doc = doc.strip("\n")
+
+        if len(doc) > 0:
+            app.question_gen.generate(doc, "short_answer", 1)
