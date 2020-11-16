@@ -9,11 +9,10 @@ class QuestionGen:
 
     # Still a mock
     # Input: Document: String of any length.
-    #        See /hafalin/data/input_example_1.txt for example.
+    #        See /hafalin/data/examples/input_example_1.txt.
 
-    # Output: A dictionary. for example:
-    #         See /hafalin/data/output_example_1_short_answer.txt
-    #         and /hafalin/data/output_example_1_multiple_choice.txt for example.
+    # Output: A list of dictionary
+    #         See generate_short_answer() and generate_multiple_choice() below
 
     # Outputs explanation per key:
 
@@ -30,10 +29,11 @@ class QuestionGen:
     #    Case doesn't matter because we will lowercase both student's answer and reference answer.
     #    Student's answer is correct if it matches one of the List element.
     #    We will also use edit distance so minor typo won't be deemed as incorrect.
-    def generate(self, document, question_type):
+    def generate(self, document, question_type, max_questions):
 
         self.document = document
         self.question_type = question_type
+        self.max_questions = max_questions
 
         # Call appropriate function
         if question_type == "multiple_choice":
@@ -47,48 +47,49 @@ class QuestionGen:
 
     # Still a mock
     # Sample output:
-    # {
-    #
-    #     "type": "short_answer",
-    #
+    # [{
     #     "question": "Salah satu pelabuhan yang terdapat di Provinsi Sumatera Barat adalah Pelabuhan ....",
     #
     #     "answer": ["Teluk Bayur", "Selat Sunda"]
-    # }
+    # }]
     def generate_short_answer(self):
+
+        # List of questions generated
+        generated_questions = []
 
         if self.is_mock:
 
-            # Read output example
-            with open(OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, "r") as infile:
-                data = infile.readlines()
+            # Generate question max_questions times
+            for _ in range(self.max_questions):
 
-            # The first line is the question
-            question = data[0].strip("\n")
-            del(data[0])
+                # Read output example
+                with open(OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, "r") as infile:
+                    data = infile.readlines()
 
-            answer_candidates = []
+                # The first line is the question
+                question = data[0].strip("\n")
+                del(data[0])
 
-            # The remaining lines are the answer candidates
-            for answer in data:
-                answer_candidates.append(answer.strip("\n"))
+                answer_candidates = []
+
+                # The remaining lines are the answer candidates
+                for answer in data:
+                    answer_candidates.append(answer.strip("\n"))
+
+                # Append dict object
+                generated_questions.append({
+                    "question": question,
+                    "answer": answer_candidates
+                })
 
         else:
             raise Exception("Not implemented yet!")
 
-        # Built return object
-        return {
-            "type": self.question_type,
-            "question": question,
-            "answer": answer_candidates
-        }
+        return generated_questions
 
     # Still a mock
     # Sample output:
-    # {
-    #
-    #     "type": "multiple_choice",
-    #
+    # [{
     #     "question": "Pulau Sumatera sebelah selatan dan barat berbatasan dengan ....",
     #
     #     "choices": {
@@ -99,48 +100,55 @@ class QuestionGen:
     #     },
     #
     #     "answer": "a"
-    # }
+    # }]
     def generate_multiple_choice(self):
+
+        # List of questions generated
+        generated_questions = []
 
         if self.is_mock:
 
-            # Read output example
-            with open(OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH, "r") as infile:
-                data = infile.readlines()
+            # Generate question max_questions times
+            for _ in range(self.max_questions):
 
-            # The first line is the question
-            question = data[0].strip("\n")
-            del(data[0])
+                # Read output example
+                with open(OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH, "r") as infile:
+                    data = infile.readlines()
 
-            choices = {}
+                # The first line is the question
+                question = data[0].strip("\n")
+                del(data[0])
 
-            # The remaining lines, except the last line, are the answer choices
-            for i, line in enumerate(data):
+                choices = {}
 
-                if i == len(data) - 1:
-                    break
+                # The remaining lines, except the last line, are the answer choices
+                for i, line in enumerate(data):
 
-                # Choice line example:
-                # a;Selat Sunda dan Samudera Pasifik
-                line_tuple = line.split(";")
+                    if i == len(data) - 1:
+                        break
 
-                letter_choice = line_tuple[0]
+                    # Choice line example:
+                    # a;Selat Sunda dan Samudera Pasifik
+                    line_tuple = line.split(";")
 
-                answer = line_tuple[1]
-                answer = answer.strip("\n")
+                    letter_choice = line_tuple[0]
 
-                choices[letter_choice] = answer
+                    answer = line_tuple[1]
+                    answer = answer.strip("\n")
 
-            # The last line is the correct choice
-            answer = data[-1].strip("\n")
+                    choices[letter_choice] = answer
+
+                # The last line is the correct choice
+                answer = data[-1].strip("\n")
+
+                # Append dict object
+                generated_questions.append({
+                    "question": question,
+                    "choices": choices,
+                    "answer": answer
+                })
 
         else:
             raise Exception("Not implemented yet!")
 
-        # Build return object
-        return {
-            "type": self.question_type,
-            "question": question,
-            "choices": choices,
-            "answer": answer
-        }
+        return generated_questions

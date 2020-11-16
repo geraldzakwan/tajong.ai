@@ -12,34 +12,52 @@ A web app that could automatically generate academic questions (multiple choice 
 
   `python3 app.py`
 
-# How to use API (Using GET params or POST JSON)
+# How to use API
 
-- Example Request to Get Short Answer Question
-
-```
-curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?document=test&type=short_answer'
-```
+- Example Request using GET params
 
 ```
-curl --location --request POST 'https://hafalin.herokuapp.com/generate_question/' \
+curl --location --request GET 'http://127.0.0.1:5002/generate_question?document=test&type=all&max_questions=1'
+```
+
+- Example Request using POST JSON
+
+```
+curl --location --request POST 'http://127.0.0.1:5002/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "test",
-    "type": "short_answer"
+    "type": "all",
+    "max_questions": 1
 }'
 ```
 
-- Example Request to Get Multiple Choice Question
+- Example Response in JSON
 
 ```
-curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?document=test&type=multiple_choice'
-```
-
-```
-curl --location --request POST 'https://hafalin.herokuapp.com/generate_question/' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "document": "test",
-    "type": "multiple_choice"
-}'
+{
+    "data": {
+        "multiple_choice": [
+            {
+                "answer": "a",
+                "choices": {
+                    "a": "Selat Sunda dan Samudera Pasifik",
+                    "b": "Selat Sunda dan Samudera Indonesia",
+                    "c": "Selat Sunda dan Samudera Hindia",
+                    "d": "Selat Sunda dan Samudera Arktik"
+                },
+                "question": "Pulau Sumatera sebelah selatan dan barat berbatasan dengan ...."
+            }
+        ],
+        "short_answer": [
+            {
+                "answer": [
+                    "Teluk Bayur",
+                    "Selat Sunda"
+                ],
+                "question": "Salah satu pelabuhan yang terdapat di Provinsi Sumatera Barat adalah Pelabuhan ...."
+            }
+        ]
+    }
+}
 ```
