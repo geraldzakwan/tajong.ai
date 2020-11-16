@@ -1,14 +1,18 @@
 from flask import jsonify
 
 def reply_success(data):
-    return jsonify({
+    response = jsonify({
         "data": data
     })
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 def reply_error(code, message):
-    return jsonify({
+    response = jsonify({
         "error": {
             "code": code,
             "message": message
         }
     })
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
