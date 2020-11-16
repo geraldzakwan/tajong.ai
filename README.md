@@ -17,13 +17,13 @@ A web app that could automatically generate academic questions (multiple choice 
 - Example Request using GET params
 
 ```
-curl --location --request GET 'http://127.0.0.1:5002/generate_question?document=test&type=all&max_questions=1'
+curl --location --request GET 'https://https://hafalin.herokuapp.com/generate_question?document=test&type=all&max_questions=1'
 ```
 
 - Example Request using POST JSON
 
 ```
-curl --location --request POST 'http://127.0.0.1:5002/generate_question/' \
+curl --location --request POST 'http://https://hafalin.herokuapp.com//generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "test",
