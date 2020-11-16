@@ -1,1 +1,1 @@
-# Constants or whatever needed here in the root dir
+# Constants or whatever needed here in the root dir of hafalin
