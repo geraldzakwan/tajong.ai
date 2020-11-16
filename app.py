@@ -24,14 +24,24 @@ def index():
     return "<h1>HAFALIN 1.0 API</h1>"
 
 @app.route("/generate_question/", methods=["GET", "POST"])
-def post_something():
+def generate_question():
     if request.method == "GET":
         document = request.args.get("document", None)
         type = request.args.get("type", None)
 
     elif request.method == "POST":
-        document = request.form.get("document", None)
-        type = request.form.get("type", None)
+        json_req = request.get_json()
+
+        document = json_req["document"]
+        type = json_req["type"]
+
+    else:
+        return jsonify({
+            "error": {
+                "code": 400,
+                "message": "Supported method is 'GET' and 'POST'"
+            }
+        })
 
     if document:
         if type:

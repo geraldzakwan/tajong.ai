@@ -11,3 +11,35 @@ A web app that could automatically generate academic questions (multiple choice 
 - Run the web app
 
   `python3 app.py`
+
+# How to use API (Using GET params or POST JSON)
+
+- Example Request to Get Short Answer Question
+
+```
+curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?document=test&type=short_answer'
+```
+
+```
+curl --location --request POST 'http://127.0.0.1:5002/generate_question/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "document": "test",
+    "type": "short_answer"
+}'
+```
+
+- Example Request to Get Multiple Choice Question
+
+```
+curl --location --request GET 'https://hafalin.herokuapp.com/generate_question?document=test&type=multiple_choice'
+```
+
+```
+curl --location --request POST 'http://127.0.0.1:5002/generate_question/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "document": "test",
+    "type": "multiple_choice"
+}'
+```
