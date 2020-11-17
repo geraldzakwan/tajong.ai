@@ -31,7 +31,7 @@ elif ner_library == "spacy":
     model_identifier = "default"
 
 else:
-    raise Exception("NER library is not supported")
+    raise Exception("NER library is not supported, use 'kata' or 'spacy'")
 
 app = Flask(__name__)
 
@@ -97,5 +97,5 @@ def generate_question():
     else:
         return reply_error(code=400, message="Document is not specified")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(threaded=True, port=configs["DEPLOY_ENV"][deploy_env]["PORT"], debug=configs["DEPLOY_ENV"][deploy_env]["DEBUG"])

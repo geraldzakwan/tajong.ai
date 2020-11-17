@@ -39,7 +39,7 @@ class NER:
         start = time.time()
 
         if self.ner_library == "kata":
-            self.model_url, self.auth_token = self.model_identifier.split(";")
+            self.model_url, self.auth_token = self.model_identifier.strip("\n").split(";")
             self.request_headers = {
                 "Authorization": "Bearer {}".format(self.auth_token)
             }
@@ -49,6 +49,12 @@ class NER:
 
         if self.verbose:
             print("Model is loaded from: {}".format(self.model_identifier))
+
+            if self.ner_library == "kata":
+                print("Model URL: {}".format(self.model_url))
+                print("Request headers: ")
+                print(self.request_headers)
+
             print("Time elapsed: {} seconds".format(time.time() - start))
             print("--------------------------------------------------")
 
@@ -65,13 +71,12 @@ class NER:
 
                 req = requests.post(self.model_url, json=payload, headers=self.request_headers)
 
-                ent_list = req.json()["result"]["kata"]
+                self.pred_docs_ents.append(req.json()["result"]["kata"])
 
             if self.verbose:
+                self.display()
                 print("Time elapsed: {} seconds".format(time.time() - start))
                 print("--------------------------------------------------")
-
-            raise Exception
 
         elif self.ner_library == "spacy":
             for doc in docs:
@@ -85,8 +90,17 @@ class NER:
         return self.pred_docs_ents
 
     def display(self):
+        start = time.time()
+
         if self.ner_library == "kata":
-            pass
+            for pred_ents in self.pred_docs_ents:
+                print(pred_ents)
+                print("--------------------------------------------------")
+
+                print("Entities: {}".format([(ent["value"], ent["label"], ent["start"], ent["end"]) for ent in pred_ents]))
+
+                print("Time elapsed: {} seconds".format(time.time() - start))
+                print("--------------------------------------------------")
 
         elif self.ner_library == "spacy":
             for pred_ents in self.pred_docs_ents:
@@ -96,4 +110,7 @@ class NER:
                 print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
 
                 displacy.render(pred_ents, style="ent")
+                print("--------------------------------------------------")
+
+                print("Time elapsed: {} seconds".format(time.time() - start))
                 print("--------------------------------------------------")

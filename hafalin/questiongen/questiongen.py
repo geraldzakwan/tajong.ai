@@ -60,7 +60,7 @@ class QuestionGen:
             return self.generate_short_answer()
 
         else:
-            raise Exception("Question type is not supported!")
+            raise Exception("Question type is not supported, use 'short_answer' or 'multiple_choice'")
 
     # Still a mock
     # Sample output:
@@ -294,21 +294,67 @@ class QuestionGen:
         self.pred_ents = self.ner.predict([self.document])[0]
         self.sentence_ents = []
 
-        for sentence in self.document.split("."):
-            self.ents = []
+        if self.ner.ner_library == "kata":
+            for sentence in self.document.split("."):
+                self.ents = []
 
-            for ent in self.pred_ents.ents:
-                word, label = ent.text, ent.label_
-                word_idx = sentence.find(word)
+                for ent in self.pred_ents:
+                    word, word_idx, label = ent["value"], ent["start"], ent["label"]
 
-                if word_idx > -1:
                     self.ents.append((word, word_idx, label))
 
-            self.sentence_ents.append((sentence, self.ents))
+                self.sentence_ents.append((sentence, self.ents))
 
-        if self.verbose:
-            print(self.sentence_ents)
-            print("--------------------------------------------------")
-            print("Identify entities finishes")
-            print("Time elapsed: {} seconds".format(time.time() - start))
-            print("--------------------------------------------------")
+            if self.verbose:
+                print(self.sentence_ents)
+                print("--------------------------------------------------")
+                print("Identify entities finishes")
+                print("Time elapsed: {} seconds".format(time.time() - start))
+                print("--------------------------------------------------")
+
+        elif self.ner.ner_library == "spacy":
+            for sentence in self.document.split("."):
+                self.ents = []
+
+                for ent in self.pred_ents.ents:
+                    word, label = ent.text, ent.label_
+                    word_idx = sentence.find(word)
+
+                    if word_idx > -1:
+                        self.ents.append((word, word_idx, label))
+
+                self.sentence_ents.append((sentence, self.ents))
+
+            if self.verbose:
+                print(self.sentence_ents)
+                print("--------------------------------------------------")
+                print("Identify entities finishes")
+                print("Time elapsed: {} seconds".format(time.time() - start))
+                print("--------------------------------------------------")
+
+if __name__ == "__main__":
+    question_gen = QuestionGen(
+        is_mock=False,
+        ner=NER(
+            ner_library="kata",
+            model_identifier="https://geist.kata.ai/nlus/tajong:hafalin/predict;fccfb733-1dfc-4f48-a42b-1db3bd7ef9ba\n",
+            verbose=True
+        ),
+        verbose=True
+    )
+
+    # question_gen = QuestionGen(
+    #     is_mock=False,
+    #     ner=NER(
+    #         ner_library="spacy",
+    #         model_identifier="default",
+    #         verbose=True
+    #     ),
+    #     verbose=True
+    # )
+
+    question_gen.generate(
+        document="Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera. Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur. Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia. Mereka juga melewati Provinsi Bengkulu, Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta.",
+        question_type="short_answer",
+        max_questions=5
+    )
