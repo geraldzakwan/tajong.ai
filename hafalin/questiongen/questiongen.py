@@ -214,9 +214,12 @@ class QuestionGen:
                     word, _, label = ent
 
                     if label not in entity_pool:
-                        entity_pool[label] = []
+                        entity_pool[label] = set([])
 
-                    entity_pool[label].append(word)
+                    entity_pool[label].add(word)
+
+            for label in entity_pool:
+                entity_pool[label] = list(entity_pool[label])
 
             for (sentence, ents) in self.sentence_ents:
                 if self.verbose:

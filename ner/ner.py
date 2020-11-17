@@ -75,6 +75,7 @@ class NER:
 
             if self.verbose:
                 self.display()
+                print("Predict finishes")
                 print("Time elapsed: {} seconds".format(time.time() - start))
                 print("--------------------------------------------------")
 
@@ -84,6 +85,7 @@ class NER:
 
             if self.verbose:
                 self.display()
+                print("Predict finishes")
                 print("Time elapsed: {} seconds".format(time.time() - start))
                 print("--------------------------------------------------")
 
