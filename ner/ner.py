@@ -55,22 +55,25 @@ class NER:
     def predict(self, docs):
         start = time.time()
 
+        self.pred_docs_ents = []
+
         if self.ner_library == "kata":
             for doc in docs:
                 payload = {
                     "text": doc
                 }
 
-                r = requests.post(self.model_url, json=payload, headers=self.request_headers)
+                req = requests.post(self.model_url, json=payload, headers=self.request_headers)
 
-                if self.verbose:
-                    print(r.text)
+                ent_list = req.json()["result"]["kata"]
+
+            if self.verbose:
+                print("Time elapsed: {} seconds".format(time.time() - start))
+                print("--------------------------------------------------")
 
             raise Exception
 
         elif self.ner_library == "spacy":
-            self.pred_docs_ents = []
-
             for doc in docs:
                 self.pred_docs_ents.append(self.nlp(doc))
 
@@ -79,13 +82,13 @@ class NER:
                 print("Time elapsed: {} seconds".format(time.time() - start))
                 print("--------------------------------------------------")
 
-            return self.pred_docs_ents
+        return self.pred_docs_ents
 
     def display(self):
         if self.ner_library == "kata":
             pass
 
-        elif self.libary == "spacy":
+        elif self.ner_library == "spacy":
             for pred_ents in self.pred_docs_ents:
                 print(pred_ents)
                 print("--------------------------------------------------")

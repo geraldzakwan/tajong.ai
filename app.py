@@ -25,12 +25,21 @@ if ner_library == "kata":
     model_url = environ.get("MODEL_URL")
     auth_token = environ.get("AUTH_TOKEN")
 
+    model_identifier = "{};{}".format(model_url, auth_token)
+
+elif ner_library == "spacy":
+    model_identifier = "default"
+
+else:
+    raise Exception("NER library is not supported")
+
 app = Flask(__name__)
+
 app.question_gen = QuestionGen(
     is_mock=configs["DEPLOY_ENV"][deploy_env]["IS_MOCK"],
     ner=NER(
         ner_library=ner_library,
-        model_identifier="{};{}".format(model_url, auth_token),
+        model_identifier=model_identifier,
         verbose=True
     ),
     verbose=True
