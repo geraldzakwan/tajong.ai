@@ -312,19 +312,3 @@ class QuestionGen:
             print("Identify entities finishes")
             print("Time elapsed: {} seconds".format(time.time() - start))
             print("--------------------------------------------------")
-
-if __name__ == '__main__':
-    question_gen = QuestionGen(
-        is_mock=False,
-        ner=NER(model_filepath="default", verbose=True),
-        verbose=True
-    )
-
-    with open(EXAMPLE_DOCS_PATH, "r") as infile:
-        docs = infile.readlines()
-
-    for doc in docs:
-        doc = doc.strip("\n")
-
-        if len(doc) > 0:
-            app.question_gen.generate(doc, "short_answer", 1)

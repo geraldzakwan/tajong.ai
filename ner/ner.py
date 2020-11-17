@@ -1,22 +1,32 @@
 import sys
 import time
+import requests
 
 from spacy import load, displacy
 
-from ner.__init__ import MODEL_DIR, DEFAULT_MODEL_PATH
 from ner.__init__ import EXAMPLE_DOCS_PATH
+from ner.__init__ import MODEL_DIR, DEFAULT_MODEL_PATH
 
 class NER:
 
-    def __init__(self, model_filepath, verbose=False):
+    def __init__(self, ner_library, model_identifier, verbose=False):
         start = time.time()
 
         self.verbose = verbose
 
-        if model_filepath == "default":
-            self.model_filepath = DEFAULT_MODEL_PATH
+        self.ner_library = ner_library
+
+        if self.ner_library == "kata":
+            self.model_identifier = model_identifier
+
+        elif self.ner_library == "spacy":
+            if model_identifier == "default":
+                self.model_identifier = DEFAULT_MODEL_PATH
+            else:
+                self.model_identifier = model_identifier
+
         else:
-            self.model_filepath = model_filepath
+            raise Exception("NER library is not supported, use 'kata' or 'spacy'")
 
         self.load_model()
 
@@ -28,53 +38,59 @@ class NER:
     def load_model(self):
         start = time.time()
 
-        self.nlp = load(self.model_filepath)
+        if self.ner_library == "kata":
+            self.model_url, self.auth_token = self.model_identifier.split(";")
+            self.request_headers = {
+                "Authorization": "Bearer {}".format(self.auth_token)
+            }
+
+        elif self.ner_library == "spacy":
+            self.nlp = load(self.model_identifier)
 
         if self.verbose:
-            print("Model is loaded from: {}".format(self.model_filepath))
+            print("Model is loaded from: {}".format(self.model_identifier))
             print("Time elapsed: {} seconds".format(time.time() - start))
             print("--------------------------------------------------")
 
     def predict(self, docs):
         start = time.time()
 
-        self.pred_docs_ents = []
+        if self.ner_library == "kata":
+            for doc in docs:
+                payload = {
+                    "text": doc
+                }
 
-        for doc in docs:
-            self.pred_docs_ents.append(self.nlp(doc))
+                r = requests.post(self.model_url, json=payload, headers=self.request_headers)
 
-        if self.verbose:
-            self.display()
-            print("Time elapsed: {} seconds".format(time.time() - start))
-            print("--------------------------------------------------")
+                if self.verbose:
+                    print(r.text)
 
-        return self.pred_docs_ents
+            raise Exception
+
+        elif self.ner_library == "spacy":
+            self.pred_docs_ents = []
+
+            for doc in docs:
+                self.pred_docs_ents.append(self.nlp(doc))
+
+            if self.verbose:
+                self.display()
+                print("Time elapsed: {} seconds".format(time.time() - start))
+                print("--------------------------------------------------")
+
+            return self.pred_docs_ents
 
     def display(self):
-        for pred_ents in self.pred_docs_ents:
-            print(pred_ents)
-            print("--------------------------------------------------")
+        if self.ner_library == "kata":
+            pass
 
-            print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
+        elif self.libary == "spacy":
+            for pred_ents in self.pred_docs_ents:
+                print(pred_ents)
+                print("--------------------------------------------------")
 
-            displacy.render(pred_ents, style="ent")
-            print("--------------------------------------------------")
+                print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
 
-if __name__ == '__main__':
-    if sys.argv[1] == "default":
-        ner = NER(model_filepath=DEFAULT_MODEL_PATH, verbose=True)
-    else:
-        ner = NER(model_filepath="{}/{}".format(MODEL_DIR, sys.argv[1]), verbose=True)
-
-    with open(EXAMPLE_DOCS_PATH, "r") as infile:
-        raw_docs = infile.readlines()
-
-    docs = []
-    
-    for doc in raw_docs:
-        doc = doc.strip("\n")
-
-        if len(doc) > 0:
-            docs.append(doc)
-
-    ner.predict(docs)
+                displacy.render(pred_ents, style="ent")
+                print("--------------------------------------------------")

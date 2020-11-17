@@ -18,12 +18,21 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-mode = environ.get("MODE")
+deploy_env = environ.get("DEPLOY_ENV")
+ner_library = environ.get("NER")
+
+if ner_library == "kata":
+    model_url = environ.get("MODEL_URL")
+    auth_token = environ.get("AUTH_TOKEN")
 
 app = Flask(__name__)
 app.question_gen = QuestionGen(
-    is_mock=configs[mode]["IS_MOCK"],
-    ner=NER(model_filepath="default", verbose=True),
+    is_mock=configs["DEPLOY_ENV"][deploy_env]["IS_MOCK"],
+    ner=NER(
+        ner_library=ner_library,
+        model_identifier="{};{}".format(model_url, auth_token),
+        verbose=True
+    ),
     verbose=True
 )
 
@@ -80,12 +89,4 @@ def generate_question():
         return reply_error(code=400, message="Document is not specified")
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=configs[mode]["PORT"], debug=configs[mode]["DEBUG"])
-    # with open(EXAMPLE_DOCS_PATH, "r") as infile:
-    #     docs = infile.readlines()
-    #
-    # for doc in docs:
-    #     doc = doc.strip("\n")
-    #
-    #     if len(doc) > 0:
-    #         app.question_gen.generate(doc, "short_answer", 1)
+    app.run(threaded=True, port=configs["DEPLOY_ENV"][deploy_env]["PORT"], debug=configs["DEPLOY_ENV"][deploy_env]["DEBUG"])

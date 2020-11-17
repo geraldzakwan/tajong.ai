@@ -17,7 +17,7 @@ A web app that could automatically generate academic questions (multiple choice 
 - Example Request using POST JSON
 
 ```
-curl --location --request POST 'http://127.0.0.1:5000/generate_question/' \
+curl --location --request POST 'https://hafalin.herokuapp.com/generate_question/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "document": "Roro, Guntur, dan Kanguru baru saja selesai melakukan karya wisata ke Sumatera Barat yang terletak di Pulau Sumatera. Pulau ini berbatasan dengan Teluk Benggala pada sebelah utara, Selat Sunda pada sebelah selatan, Samudera Hindia pada sebelah barat, dan Selat Malaka pada sebelah timur. Sebelum pulang, supir bus sengaja membawa mereka mampir ke Pelabuhan Teluk Bayur yang merupakan salah satu dari lima pelabuhan terbesar dan tersibuk di Indonesia. Mereka juga melewati Provinsi Bengkulu, Sumatera Selatan, dan Lampung karena searah dengan jalan pulang menuju Jakarta.",
