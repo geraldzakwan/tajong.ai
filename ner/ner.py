@@ -120,8 +120,6 @@ class NER:
 
         elif self.ner_library == "spacy":
             for pred_doc_ents in self.pred_docs_ents:
-                # for _, sent_pred_ents in pred_doc_ents:
-                    # for pred_ents in sent_pred_ents:
                 for _, pred_ents in pred_doc_ents:
                     print(pred_ents)
                     print("--------------------------------------------------")

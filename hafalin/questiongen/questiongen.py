@@ -219,6 +219,9 @@ class QuestionGen:
                     entity_pool[label].add(word)
 
             for label in entity_pool:
+                if self.verbose:
+                    print(entity_pool[label])
+
                 entity_pool[label] = list(entity_pool[label])
 
             for (sentence, ents) in self.sentence_ents:
@@ -240,6 +243,7 @@ class QuestionGen:
                         question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
 
                     entity_candidates = entity_pool[label]
+                    entity_candidates.remove(word)
 
                     num_candidates = len(entity_candidates)
                     if num_candidates < MIN_CHOICES:
