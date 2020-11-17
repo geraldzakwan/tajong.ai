@@ -65,13 +65,21 @@ class NER:
 
         if self.ner_library == "kata":
             for doc in docs:
-                payload = {
-                    "text": doc
-                }
+                pred_sent_ents = []
 
-                req = requests.post(self.model_url, json=payload, headers=self.request_headers)
+                for sentence in doc.split("."):
+                    sentence = sentence.strip("\n")
 
-                self.pred_docs_ents.append(req.json()["result"]["kata"])
+                    if len(sentence) > 0:
+                        payload = {
+                            "text": sentence
+                        }
+
+                        req = requests.post(self.model_url, json=payload, headers=self.request_headers)
+
+                        pred_sent_ents.append(req.json()["result"]["kata"])
+
+                self.pred_docs_ents.append(pred_sent_ents)
 
             if self.verbose:
                 self.display()
@@ -81,7 +89,15 @@ class NER:
 
         elif self.ner_library == "spacy":
             for doc in docs:
-                self.pred_docs_ents.append(self.nlp(doc))
+                pred_sent_ents = []
+
+                for sentence in doc.split("."):
+                    sentence = sentence.strip("\n")
+
+                    if len(sentence) > 0:
+                        pred_sent_ents.append((sentence, self.nlp(sentence)))
+
+                self.pred_docs_ents.append(pred_sent_ents)
 
             if self.verbose:
                 self.display()
@@ -95,24 +111,22 @@ class NER:
         start = time.time()
 
         if self.ner_library == "kata":
-            for pred_ents in self.pred_docs_ents:
-                print(pred_ents)
+            for sent_pred_ents in self.pred_docs_ents:
+                print(sent_pred_ents)
                 print("--------------------------------------------------")
 
-                print("Entities: {}".format([(ent["value"], ent["label"], ent["start"], ent["end"]) for ent in pred_ents]))
-
-                print("Time elapsed: {} seconds".format(time.time() - start))
-                print("--------------------------------------------------")
+                print("Entities: {}".format([(ent["value"], ent["label"], ent["start"], ent["end"]) for ent in sent_pred_ents]))
 
         elif self.ner_library == "spacy":
-            for pred_ents in self.pred_docs_ents:
-                print(pred_ents)
-                print("--------------------------------------------------")
+            for _, sent_pred_ents in self.pred_docs_ents:
+                for pred_ents in sent_pred_ents:
+                    print(pred_ents)
+                    print("--------------------------------------------------")
 
-                print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
+                    print("Entities: {}".format([(ent.text, ent.label_) for ent in pred_ents.ents]))
 
-                displacy.render(pred_ents, style="ent")
-                print("--------------------------------------------------")
+                    displacy.render(pred_ents, style="ent")
+                    print("--------------------------------------------------")
 
-                print("Time elapsed: {} seconds".format(time.time() - start))
-                print("--------------------------------------------------")
+        print("Time elapsed: {} seconds".format(time.time() - start))
+        print("--------------------------------------------------")

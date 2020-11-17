@@ -298,10 +298,10 @@ class QuestionGen:
         self.sentence_ents = []
 
         if self.ner.ner_library == "kata":
-            for sentence in self.document.split("."):
+            for sent_ents in self.pred_ents:
                 self.ents = []
 
-                for ent in self.pred_ents:
+                for ent in sent_ents:
                     word, word_idx, label = ent["value"], ent["start"], ent["label"]
 
                     self.ents.append((word, word_idx, label))
@@ -316,15 +316,14 @@ class QuestionGen:
                 print("--------------------------------------------------")
 
         elif self.ner.ner_library == "spacy":
-            for sentence in self.document.split("."):
+            for sentence, sent_ents in self.pred_ents:
                 self.ents = []
 
-                for ent in self.pred_ents.ents:
+                for ent in sent_ents.ents:
                     word, label = ent.text, ent.label_
                     word_idx = sentence.find(word)
 
-                    if word_idx > -1:
-                        self.ents.append((word, word_idx, label))
+                    self.ents.append((word, word_idx, label))
 
                 self.sentence_ents.append((sentence, self.ents))
 
