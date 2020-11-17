@@ -298,7 +298,7 @@ class QuestionGen:
         self.sentence_ents = []
 
         if self.ner.ner_library == "kata":
-            for sent_ents in self.pred_ents:
+            for sentence, sent_ents in self.pred_ents:
                 self.ents = []
 
                 for ent in sent_ents:

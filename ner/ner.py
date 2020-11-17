@@ -77,7 +77,7 @@ class NER:
 
                         req = requests.post(self.model_url, json=payload, headers=self.request_headers)
 
-                        pred_sent_ents.append(req.json()["result"]["kata"])
+                        pred_sent_ents.append((sentence, req.json()["result"]["kata"]))
 
                 self.pred_docs_ents.append(pred_sent_ents)
 
@@ -111,15 +111,18 @@ class NER:
         start = time.time()
 
         if self.ner_library == "kata":
-            for sent_pred_ents in self.pred_docs_ents:
-                print(sent_pred_ents)
-                print("--------------------------------------------------")
+            for pred_doc_ents in self.pred_docs_ents:
+                for sentence, sent_pred_ents in pred_doc_ents:
+                    print(sent_pred_ents)
+                    print("--------------------------------------------------")
 
-                print("Entities: {}".format([(ent["value"], ent["label"], ent["start"], ent["end"]) for ent in sent_pred_ents]))
+                    print("Entities: {}".format([(ent["value"], ent["label"], ent["start"], ent["end"]) for ent in sent_pred_ents]))
 
         elif self.ner_library == "spacy":
-            for _, sent_pred_ents in self.pred_docs_ents:
-                for pred_ents in sent_pred_ents:
+            for pred_doc_ents in self.pred_docs_ents:
+                # for _, sent_pred_ents in pred_doc_ents:
+                    # for pred_ents in sent_pred_ents:
+                for _, pred_ents in pred_doc_ents:
                     print(pred_ents)
                     print("--------------------------------------------------")
 
