@@ -1,4 +1,7 @@
 import time
+import string
+
+import numpy as np
 
 from random import randint, sample
 
@@ -80,8 +83,10 @@ class QuestionGen:
                 print(ents)
                 print("--------------------------------------------------")
 
-            for ent in ents:
-                word, word_idx, label = ent
+            if len(ents) > 0:
+                rand_ent_idx = int(np.random.uniform(0, len(ents)))
+
+                word, word_idx, label = ents[rand_ent_idx]
 
                 if word_idx == 0:
                     question = "... " + sentence[len(word):]
@@ -98,10 +103,6 @@ class QuestionGen:
                 iteration += 1
                 if iteration > self.max_questions:
                     break
-
-            if iteration > self.max_questions:
-                break
-
 
         if self.verbose:
             print("Generate short answer finishes")
@@ -158,8 +159,10 @@ class QuestionGen:
                 print(ents)
                 print("--------------------------------------------------")
 
-            for ent in ents:
-                word, word_idx, label = ent
+            if len(ents) > 0:
+                rand_ent_idx = int(np.random.uniform(0, len(ents)))
+
+                word, word_idx, label = ents[rand_ent_idx]
 
                 if word_idx == 0:
                     question = "... " + sentence[len(word):]
@@ -169,7 +172,11 @@ class QuestionGen:
                     question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
 
                 entity_candidates = entity_pool[label]
-                entity_candidates.remove(word)
+
+                try:
+                    entity_candidates.remove(word)
+                except:
+                    pass
 
                 num_candidates = len(entity_candidates)
                 if num_candidates < MIN_CHOICES:
@@ -203,9 +210,6 @@ class QuestionGen:
                 if iteration > self.max_questions:
                     break
 
-            if iteration > self.max_questions:
-                break
-
         if self.verbose:
             print("Generate multiple choice finishes")
             print("Time elapsed: {} seconds".format(time.time() - start))
@@ -233,6 +237,7 @@ class QuestionGen:
 
                 for ent in sent_ents:
                     word, word_idx, label = ent["value"], ent["start"], ent["label"]
+                    word = word.translate(str.maketrans('', '', string.punctuation))
 
                     self.ents.append((word, word_idx, label))
 
@@ -251,6 +256,8 @@ class QuestionGen:
 
                 for ent in sent_ents.ents:
                     word, label = ent.text, ent.label_
+                    word = word.translate(str.maketrans('', '', string.punctuation))
+
                     word_idx = sentence.find(word)
 
                     self.ents.append((word, word_idx, label))
