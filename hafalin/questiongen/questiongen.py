@@ -129,9 +129,12 @@ class QuestionGen:
         # List of questions generated
         generated_questions = []
 
+        self.identify_entities()
+
         iteration = 0
 
         entity_pool = {}
+
         for (_, ents) in self.sentence_ents:
             for ent in ents:
                 word, _, label = ent
