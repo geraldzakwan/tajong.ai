@@ -9,23 +9,17 @@ from ner.ner import NER
 
 class QuestionGen:
 
-    def __init__(self, is_mock, ner, verbose):
+    def __init__(self, ner, verbose):
         start = time.time()
 
+        self.ner = ner
+
         self.verbose = verbose
-
-        self.is_mock = is_mock
-
-        self.ner = None
-        if not self.is_mock:
-            self.ner = ner
-
         if self.verbose:
             print("Initialization finishes")
             print("Time elapsed: {} seconds".format(time.time() - start))
             print("--------------------------------------------------")
 
-    # Still a mock
     # Input: Document: String of any length.
     #        See /hafalin/data/examples/input_example_1.txt.
 
@@ -62,7 +56,6 @@ class QuestionGen:
         else:
             raise Exception("Question type is not supported, use 'short_answer' or 'multiple_choice'")
 
-    # Still a mock
     # Sample output:
     # [{
     #     "question": "Salah satu pelabuhan yang terdapat di Provinsi Sumatera Barat adalah Pelabuhan ....",
@@ -75,65 +68,39 @@ class QuestionGen:
         # List of questions generated
         generated_questions = []
 
-        if self.is_mock:
+        self.identify_entities()
 
-            # Generate question max_questions times
-            for _ in range(self.max_questions):
+        iteration = 0
 
-                # Read output example
-                with open(OUTPUT_EXAMPLE_1_SHORT_ANSWER_FILEPATH, "r") as infile:
-                    data = infile.readlines()
+        for (sentence, ents) in self.sentence_ents:
+            if self.verbose:
+                print("Sentence: {}".format(sentence))
+                print("--------------------------------------------------")
+                print("Ents:")
+                print(ents)
+                print("--------------------------------------------------")
 
-                # The first line is the question
-                question = data[0].strip("\n")
-                del(data[0])
+            for ent in ents:
+                word, word_idx, label = ent
 
-                answer_candidates = []
+                if word_idx == 0:
+                    question = "... " + sentence[len(word):]
+                elif word_idx + len(word) == len(sentence):
+                    question = sentence[:word_idx] + "..."
+                else:
+                    question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
 
-                # The remaining lines are the answer candidates
-                for answer in data:
-                    answer_candidates.append(answer.strip("\n"))
-
-                # Append dict object
                 generated_questions.append({
                     "question": question,
-                    "answer": answer_candidates
+                    "answer": [word]
                 })
 
-        else:
-            self.identify_entities()
-
-            iteration = 0
-
-            for (sentence, ents) in self.sentence_ents:
-                if self.verbose:
-                    print("Sentence: {}".format(sentence))
-                    print("--------------------------------------------------")
-                    print("Ents:")
-                    print(ents)
-                    print("--------------------------------------------------")
-
-                for ent in ents:
-                    word, word_idx, label = ent
-
-                    if word_idx == 0:
-                        question = "... " + sentence[len(word):]
-                    elif word_idx + len(word) == len(sentence):
-                        question = sentence[:word_idx] + "..."
-                    else:
-                        question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
-
-                    generated_questions.append({
-                        "question": question,
-                        "answer": [word]
-                    })
-
-                    iteration += 1
-                    if iteration > self.max_questions:
-                        break
-
+                iteration += 1
                 if iteration > self.max_questions:
                     break
+
+            if iteration > self.max_questions:
+                break
 
 
         if self.verbose:
@@ -143,7 +110,6 @@ class QuestionGen:
 
         return generated_questions
 
-    # Still a mock
     # Sample output:
     # [{
     #     "question": "Pulau Sumatera sebelah selatan dan barat berbatasan dengan ....",
@@ -163,122 +129,79 @@ class QuestionGen:
         # List of questions generated
         generated_questions = []
 
-        if self.is_mock:
+        iteration = 0
 
-            # Generate question max_questions times
-            for _ in range(self.max_questions):
+        entity_pool = {}
+        for (_, ents) in self.sentence_ents:
+            for ent in ents:
+                word, _, label = ent
 
-                # Read output example
-                with open(OUTPUT_EXAMPLE_1_MULTIPLE_CHOICE_FILEPATH, "r") as infile:
-                    data = infile.readlines()
+                if label not in entity_pool:
+                    entity_pool[label] = set([])
 
-                # The first line is the question
-                question = data[0].strip("\n")
-                del(data[0])
+                entity_pool[label].add(word)
+
+        for label in entity_pool:
+            if self.verbose:
+                print(entity_pool[label])
+
+            entity_pool[label] = list(entity_pool[label])
+
+        for (sentence, ents) in self.sentence_ents:
+            if self.verbose:
+                print("Sentence: {}".format(sentence))
+                print("--------------------------------------------------")
+                print("Ents:")
+                print(ents)
+                print("--------------------------------------------------")
+
+            for ent in ents:
+                word, word_idx, label = ent
+
+                if word_idx == 0:
+                    question = "... " + sentence[len(word):]
+                elif word_idx + len(word) == len(sentence):
+                    question = sentence[:word_idx] + "..."
+                else:
+                    question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
+
+                entity_candidates = entity_pool[label]
+                entity_candidates.remove(word)
+
+                num_candidates = len(entity_candidates)
+                if num_candidates < MIN_CHOICES:
+                    break
+
+                if num_candidates > MAX_CHOICES:
+                    num_candidates = MAX_CHOICES
+
+                random_entity_idxes = sample(range(0, len(entity_candidates)), num_candidates)
+
+                right_choice = CHOICES[randint(0, num_candidates - 1)]
 
                 choices = {}
+                idx = 0
 
-                # The remaining lines, except the last line, are the answer choices
-                for i, line in enumerate(data):
+                for choice in CHOICES[:num_candidates]:
 
-                    if i == len(data) - 1:
-                        break
+                    if choice == right_choice:
+                        choices[choice] = word
+                    else:
+                        choices[choice] = entity_candidates[random_entity_idxes[idx]]
+                        idx = idx + 1
 
-                    # Choice line example:
-                    # a;Selat Sunda dan Samudera Pasifik
-                    line_tuple = line.split(";")
-
-                    letter_choice = line_tuple[0]
-
-                    answer = line_tuple[1]
-                    answer = answer.strip("\n")
-
-                    choices[letter_choice] = answer
-
-                # The last line is the correct choice
-                answer = data[-1].strip("\n")
-
-                # Append dict object
                 generated_questions.append({
                     "question": question,
                     "choices": choices,
-                    "answer": answer
+                    "answer": right_choice
                 })
 
-        else:
-            iteration = 0
-
-            entity_pool = {}
-            for (_, ents) in self.sentence_ents:
-                for ent in ents:
-                    word, _, label = ent
-
-                    if label not in entity_pool:
-                        entity_pool[label] = set([])
-
-                    entity_pool[label].add(word)
-
-            for label in entity_pool:
-                if self.verbose:
-                    print(entity_pool[label])
-
-                entity_pool[label] = list(entity_pool[label])
-
-            for (sentence, ents) in self.sentence_ents:
-                if self.verbose:
-                    print("Sentence: {}".format(sentence))
-                    print("--------------------------------------------------")
-                    print("Ents:")
-                    print(ents)
-                    print("--------------------------------------------------")
-
-                for ent in ents:
-                    word, word_idx, label = ent
-
-                    if word_idx == 0:
-                        question = "... " + sentence[len(word):]
-                    elif word_idx + len(word) == len(sentence):
-                        question = sentence[:word_idx] + "..."
-                    else:
-                        question = sentence[:word_idx] + " ... " + sentence[word_idx + len(word):]
-
-                    entity_candidates = entity_pool[label]
-                    entity_candidates.remove(word)
-
-                    num_candidates = len(entity_candidates)
-                    if num_candidates < MIN_CHOICES:
-                        break
-
-                    if num_candidates > MAX_CHOICES:
-                        num_candidates = MAX_CHOICES
-
-                    random_entity_idxes = sample(range(0, len(entity_candidates)), num_candidates)
-
-                    right_choice = CHOICES[randint(0, num_candidates - 1)]
-
-                    choices = {}
-                    idx = 0
-
-                    for choice in CHOICES[:num_candidates]:
-
-                        if choice == right_choice:
-                            choices[choice] = word
-                        else:
-                            choices[choice] = entity_candidates[random_entity_idxes[idx]]
-                            idx = idx + 1
-
-                    generated_questions.append({
-                        "question": question,
-                        "choices": choices,
-                        "answer": right_choice
-                    })
-
-                    iteration += 1
-                    if iteration > self.max_questions:
-                        break
-
+                iteration += 1
                 if iteration > self.max_questions:
                     break
+
+            if iteration > self.max_questions:
+                break
 
         if self.verbose:
             print("Generate multiple choice finishes")
@@ -340,7 +263,6 @@ class QuestionGen:
 
 if __name__ == "__main__":
     question_gen = QuestionGen(
-        is_mock=False,
         ner=NER(
             ner_library="kata",
             model_identifier="https://geist.kata.ai/nlus/tajong:hafalin/predict;fccfb733-1dfc-4f48-a42b-1db3bd7ef9ba\n",
@@ -350,7 +272,6 @@ if __name__ == "__main__":
     )
 
     # question_gen = QuestionGen(
-    #     is_mock=False,
     #     ner=NER(
     #         ner_library="spacy",
     #         model_identifier="default",

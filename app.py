@@ -36,7 +36,6 @@ else:
 app = Flask(__name__)
 
 app.question_gen = QuestionGen(
-    is_mock=configs["DEPLOY_ENV"][deploy_env]["IS_MOCK"],
     ner=NER(
         ner_library=ner_library,
         model_identifier=model_identifier,
@@ -69,10 +68,6 @@ def generate_question():
     if document:
         if type:
             if max_questions:
-                if app.question_gen.is_mock:
-                    with open(INPUT_EXAMPLE_1_FILEPATH) as infile:
-                        document = infile.read().replace("\n", " ")
-
                 if type == "short_answer":
                     return reply_success(data=app.question_gen.generate(document=document, question_type="short_answer", max_questions=max_questions))
 
